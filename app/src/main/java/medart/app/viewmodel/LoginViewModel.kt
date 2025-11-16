@@ -14,7 +14,7 @@ class LoginViewModel : ViewModel() {
     fun onRutChange(newRut: String) {
         uiState = uiState.copy(rut = newRut)
     }
-
+//ejemplo
     fun onPrevisionChange(newPrev: String) {
         uiState = uiState.copy(previsionSalud = newPrev)
     }
