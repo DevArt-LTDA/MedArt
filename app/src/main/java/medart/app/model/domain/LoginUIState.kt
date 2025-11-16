@@ -1,4 +1,6 @@
 package medart.app.model.domain
 
-class LoginUIState {
-}
+data class LoginUIState(
+    val rut: String = "",
+    val previsionSalud: String = ""
+)
