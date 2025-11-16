@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import medart.app.model.domain.LoginUIState
 
+
 class LoginViewModel : ViewModel() {
 
     var uiState by mutableStateOf(LoginUIState())

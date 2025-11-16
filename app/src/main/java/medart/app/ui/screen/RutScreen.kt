@@ -8,16 +8,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import medart.app.ui.components.InputText
+import medart.app.ui.components.PrevisionDropdown
 import medart.app.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(
+fun RutScreen(
     viewModel: LoginViewModel = viewModel(),
     onContinue: () -> Unit
 ) {
-
-
-
     val state = viewModel.uiState
 
     Column(
@@ -26,11 +24,11 @@ fun LoginScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.Center
     ) {
-        // Contraseña
+        // RUT
         InputText(
             value = state.rut,
             onValueChange = viewModel::onRutChange,
-            label = "Ingrese su contraseña"
+            label = "RUT"
         )
 
 
@@ -38,10 +36,10 @@ fun LoginScreen(
 
         Button(
             onClick = onContinue,
-            enabled = state.rut.isNotBlank() ,
+            enabled = state.rut.isNotBlank(),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Iniciar sesión")
+            Text("Continuar")
         }
     }
 }
