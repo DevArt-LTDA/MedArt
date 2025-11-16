@@ -14,8 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.unit.dp
+import medart.app.domain.Reservation
 @Composable
-fun AppointmentScreen() {
+fun AppointmentScreen(onConfirmReservation: (Reservation) -> Unit) {
 
     // Especialidades de ejemplo
     val specialties = listOf(
@@ -76,6 +82,22 @@ fun AppointmentScreen() {
             Text("Confirmar hora")
         }
     }
+
+    Button(
+        onClick = {
+            val reservation = Reservation(
+                id = (System.currentTimeMillis() and 0xFFFFFFF).toInt(),
+                especialidad = selectedSpecialty,
+                horario = selectedTime
+            )
+            onConfirmReservation(reservation)
+        },
+        enabled = selectedSpecialty.isNotBlank() && selectedTime.isNotBlank(),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text("Confirmar hora")
+    }
+
 }
 
 /**
