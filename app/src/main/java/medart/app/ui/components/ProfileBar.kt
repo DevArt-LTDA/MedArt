@@ -23,8 +23,8 @@ fun ProfileBar(
 ) {
     Surface(
         modifier = modifier,
-        color = Color(0xFFF5F5F5),
-        shadowElevation = 2.dp
+        color = Color(0xFFF7F7F7),
+        shadowElevation = 20.dp
     ) {
         Row(
             modifier = Modifier

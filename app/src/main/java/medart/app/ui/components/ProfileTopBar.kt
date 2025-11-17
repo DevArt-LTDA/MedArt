@@ -1,5 +1,6 @@
 package medart.app.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -21,9 +22,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import medart.app.R
 import medart.app.domain.UserProfile
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,10 +44,10 @@ fun ProfileTopBar(
         ),
         title = {
             Column {
-                Text(
-                    text = profile?.let { "${it.nombre} ${it.apellido}" } ?: "Usuario invitado",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
+                Image(
+                    painter = painterResource(id = R.drawable.logo_devart_sin_fondo),
+                    contentDescription = "Logo MedArt",
+                    modifier = Modifier.size(32.dp)
                 )
                 profile?.rut?.let {
                     Text(

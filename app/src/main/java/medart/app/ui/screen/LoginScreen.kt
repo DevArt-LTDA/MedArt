@@ -1,137 +1,188 @@
 package medart.app.ui.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import medart.app.viewmodel.UserProfileViewModel
+import medart.app.R
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    profileViewModel: UserProfileViewModel,
-    onContinue: () -> Unit
+    onContinue: () -> Unit,
+    onRegisterClick: () -> Unit
 ) {
-    val profile = profileViewModel.profile
+    var password by rememberSaveable { mutableStateOf("") }
+    var showPassword by rememberSaveable { mutableStateOf(false) }
 
-    var step by remember { mutableStateOf(1) }      // 1 = RUT, 2 = contraseña
-    var rut by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<String?>(null) }
+    // regla simple: mínimo 6 caracteres
+    val isPasswordValid = password.length >= 6
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = if (step == 1) "Iniciar sesión - Paso 1 de 2"
-            else "Iniciar sesión - Paso 2 de 2",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            textAlign = TextAlign.Center
-        )
+    val topBlue = Color(0xFF008CFF)
+    val bgLight = Color(0xFFF7FBFF)
 
-        Spacer(modifier = Modifier.height(24.dp))
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
 
-        if (step == 1) {
-            // Paso 1: pedir RUT
-            OutlinedTextField(
-                value = rut,
-                onValueChange = { rut = it },
-                label = { Text("RUT") },
-                modifier = Modifier.fillMaxWidth()
-            )
+                        // MISMO LOGO QUE EN RutScreen
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_devart_sin_fondo),
+                            contentDescription = "Logo MedArt",
+                            modifier = Modifier
+                                .height(32.dp)
+                        )
 
-            Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(Modifier.width(8.dp))
 
-            Button(
-                onClick = {
-                    if (profile == null) {
-                        error = "No existe un usuario registrado. Regístrese primero."
-                    } else if (rut != profile.rut) {
-                        error = "RUT no encontrado."
-                    } else {
-                        error = null
-                        step = 2
+                        Text(
+                            text = "MedArt",
+                            color = topBlue,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                },
-                enabled = rut.isNotBlank(),
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Text("Continuar")
-            }
-        } else {
-            // Paso 2: pedir contraseña
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                ),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth(0.7f)
-            ) {
-                Button(
-                    onClick = {
-                        // volver a pedir RUT
-                        password = ""
-                        error = null
-                        step = 1
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Atrás")
                 }
+            )
+        }
+    ) { innerPadding ->
 
-                Button(
-                    onClick = {
-                        if (profile == null) {
-                            error = "No existe un usuario registrado."
-                            step = 1
-                        } else if (password != profile.password) {
-                            error = "Contraseña incorrecta."
-                        } else {
-                            error = null
-                            onContinue()
+        // CONTENIDO CENTRADO IGUAL QUE EN RutScreen
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(bgLight)
+                .padding(innerPadding)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+                // -------- TÍTULO --------
+                Text(
+                    text = buildAnnotatedString {
+                        withStyle(SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append("Inicia sesión ")
                         }
                     },
-                    enabled = password.isNotBlank(),
-                    modifier = Modifier.weight(1f)
+                    fontSize = 26.sp,
+                    color = Color(0xFF222222),
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "Ingresa tu contraseña para acceder al portal.",
+                    fontSize = 15.sp,
+                    color = Color(0xFF555555),
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(Modifier.height(28.dp))
+
+                // -------- CONTRASEÑA --------
+                Text(
+                    text = "Contraseña *",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = topBlue,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = { Text("Ingresa tu contraseña") },
+                    singleLine = true,
+                    visualTransformation = if (showPassword)
+                        VisualTransformation.None
+                    else
+                        PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { showPassword = !showPassword }) {
+                            Icon(
+                                imageVector = if (showPassword)
+                                    Icons.Default.VisibilityOff
+                                else
+                                    Icons.Default.Visibility,
+                                contentDescription = if (showPassword)
+                                    "Ocultar contraseña"
+                                else
+                                    "Mostrar contraseña"
+                            )
+                        }
+                    }
+                )
+
+                Spacer(Modifier.height(6.dp))
+
+                Text(
+                    text = "Recuerda no compartir tu contraseña con nadie.",
+                    fontSize = 12.sp,
+                    color = Color(0xFF777777),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(28.dp))
+
+                // -------- BOTÓN CONTINUAR --------
+                Button(
+                    onClick = { if (isPasswordValid) onContinue() },
+                    enabled = isPasswordValid,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    Text("Ingresar")
+                    Text("Iniciar sesión")
                 }
+
+                Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = "¿Olvidaste tu contraseña?",
+                    fontSize = 13.sp,
+                    color = topBlue,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                TextButton(
+                    onClick = onRegisterClick,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("¿No tienes una cuenta? Regístrate")
+                }
+
+
             }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (error != null) {
-            Text(
-                text = error!!,
-                color = Color.Red,
-                fontSize = 13.sp
-            )
         }
     }
 }

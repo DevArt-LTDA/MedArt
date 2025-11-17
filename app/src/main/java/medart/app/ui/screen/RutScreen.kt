@@ -84,7 +84,7 @@ fun RutScreen(
             Spacer(modifier = Modifier.height(18.dp))
 
             Text(
-                text = "Ingresa tu Rut para iniciar sesión o crear una nueva cuenta.",
+                text = "Ingresa tu Rut para iniciar sesión o crear una nueva cuenta",
                 fontSize = 15.sp,
                 color = Color(0xFF555555)
             )
