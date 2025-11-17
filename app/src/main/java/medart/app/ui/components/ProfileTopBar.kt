@@ -49,13 +49,7 @@ fun ProfileTopBar(
                     contentDescription = "Logo MedArt",
                     modifier = Modifier.size(32.dp)
                 )
-                profile?.rut?.let {
-                    Text(
-                        text = it,
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
-                }
+
             }
         },
         actions = {

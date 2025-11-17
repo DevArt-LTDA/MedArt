@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.material)
 
     implementation("androidx.activity:activity-compose:1.9.3")
+    implementation(libs.androidx.foundation)
 
     val composeBom = platform("androidx.compose:compose-bom:2024.09.01")
     implementation(composeBom)

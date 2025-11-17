@@ -57,14 +57,6 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = "Bienvenido al sistema de agendamiento médico",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Seleccione el tipo de atención para continuar.",
@@ -80,12 +72,16 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth(0.9f)
             )
 
+            Spacer(modifier = Modifier.height(20.dp))
+
             Text(
                 text = "Accesos rápidos",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Left
             )
+
+            Spacer(modifier = Modifier.height(20.dp))
 
             QuickAccessCard(
                 title = "Próximas citas",
@@ -94,7 +90,7 @@ fun HomeScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
             QuickAccessCard(
                 title = "Historial de citas",
