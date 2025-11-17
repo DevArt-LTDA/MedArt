@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TipoAtencionMenu(
     onConsultaMedicaClick: () -> Unit,
+    onExamenesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -36,7 +38,7 @@ fun TipoAtencionMenu(
                 .padding(16.dp)
         ) {
             Text(
-                text = "¿Qué tipo de atención necesita?",
+                text = "¿Qué tipo de atención necesitas?",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color(0xFF004B7A)
@@ -44,33 +46,71 @@ fun TipoAtencionMenu(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            ElevatedCard(
-                modifier = Modifier
-                    .width(180.dp)
-                    .height(120.dp)
-                    .clickable { onConsultaMedicaClick() },
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.elevatedCardColors(
-                    containerColor = Color.White
-                )
+            // Dos tarjetas en una fila
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                // --- Consulta Médica ---
+                ElevatedCard(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(120.dp)
+                        .clickable { onConsultaMedicaClick() },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = Color.White
+                    )
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.MedicalServices,
-                        contentDescription = "Consulta médica",
-                        tint = Color(0xFF007ACC)
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.MedicalServices,
+                            contentDescription = "Consulta médica",
+                            tint = Color(0xFF007ACC)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Consulta\nMédica",
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+
+                // --- Exámenes ---
+                ElevatedCard(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(120.dp)
+                        .clickable { onExamenesClick() },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.elevatedCardColors(
+                        containerColor = Color.White
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Consulta\nMédica",
-                        textAlign = TextAlign.Center
-                    )
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Science,
+                            contentDescription = "Exámenes",
+                            tint = Color(0xFF007ACC)
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Exámenes",
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
     }
 }
+

@@ -93,18 +93,15 @@ fun MedArtNavGraph(
                 onConsultaMedicaClick = {
                     navController.navigate(Routes.APPOINTMENT)
                 },
-                onVerPerfil = {
-                    navController.navigate(Routes.PROFILE)
+                onExamenesClick = {
+                    // TODO: navegar a pantalla de Exámenes cuando la crees
+                    // navController.navigate(Routes.EXAMENES)
                 },
-                onLogout = {
-                    profileViewModel.logout()
-                    navController.navigate(Routes.RUT) {
-                        // vaciar todo y volver a pedir RUT
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
+                onVerPerfil = { navController.navigate(Routes.PROFILE) },
+                onLogout = { navController.navigate(Routes.RUT) }
             )
         }
+
 
         // Confirmar hora -> guarda reserva y vuelve a HOME
         composable(Routes.APPOINTMENT) {

@@ -1,6 +1,9 @@
 package medart.app.ui.screen
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,11 +15,13 @@ import androidx.compose.ui.unit.sp
 import medart.app.ui.components.ProfileTopBar
 import medart.app.ui.components.TipoAtencionMenu
 import medart.app.viewmodel.UserProfileViewModel
+import medart.app.ui.components.QuickAccessCard
 
 @Composable
 fun HomeScreen(
     profileViewModel: UserProfileViewModel,
     onConsultaMedicaClick: () -> Unit,
+    onExamenesClick: () -> Unit,
     onVerPerfil: () -> Unit,
     onLogout: () -> Unit
 ) {
@@ -44,12 +49,23 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
+                text = profile?.let { "¡Hola ${it.nombre} ${it.apellido}!" } ?: "¡Hola Usuario invitado!",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Left
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
                 text = "Bienvenido al sistema de agendamiento médico",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 textAlign = TextAlign.Center
             )
+
             Spacer(modifier = Modifier.height(8.dp))
+
             Text(
                 text = "Seleccione el tipo de atención para continuar.",
                 fontSize = 14.sp,
@@ -60,8 +76,34 @@ fun HomeScreen(
 
             TipoAtencionMenu(
                 onConsultaMedicaClick = onConsultaMedicaClick,
+                onExamenesClick = onExamenesClick,
                 modifier = Modifier.fillMaxWidth(0.9f)
             )
+
+            Text(
+                text = "Accesos rápidos",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                textAlign = TextAlign.Left
+            )
+
+            QuickAccessCard(
+                title = "Próximas citas",
+                subtitle = "Revisa el detalle de tus reservas",
+                icon = Icons.Default.CalendarToday,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            QuickAccessCard(
+                title = "Historial de citas",
+                subtitle = "Accede a tus visitas anteriores",
+                icon = Icons.Default.History,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+
         }
     }
 }
