@@ -1,12 +1,10 @@
 plugins {
-    // Plugins del catálogo de versiones (los que ya tenías)
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
 
-    // Plugin de Compose para Kotlin 2.x
-    // IMPORTANTE: la versión debe coincidir con la versión de Kotlin
-    // definida en tu libs.versions.toml (por ejemplo 2.0.0, 2.0.20, etc.)
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.0"
+
 }
 
 android {
@@ -33,49 +31,46 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
-
-    // Activar Jetpack Compose
     buildFeatures {
         compose = true
     }
 
-    // Con Kotlin 2.x + plugin compose NO hace falta composeOptions{}
+
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 
 dependencies {
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-
-    implementation("androidx.activity:activity-compose:1.9.3")
-    implementation(libs.androidx.foundation)
-
-    val composeBom = platform("androidx.compose:compose-bom:2024.09.01")
-    implementation(composeBom)
-    androidTestImplementation(composeBom)
-
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material-icons-extended")
-
-    // >>> AÑADIR ESTO <<<
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation("androidx.compose.material:material-icons-extended")
-
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.navigation:navigation-compose:2.8.3")
-
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-}
 
+    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.compose.ui:ui:1.5.4")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
+    implementation("androidx.compose.ui:ui-text:1.5.4") // ← 👈 ESTA ES LA CLAVE
+    implementation("androidx.compose.material3:material3:1.1.2")
+
+    debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.4")
+
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")   // 👈 en vez de ksp
+    implementation("androidx.room:room-ktx:2.6.1")
+}

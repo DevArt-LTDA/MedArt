@@ -4,10 +4,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.*
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun QuickAccessCard(
     title: String,
@@ -24,13 +28,12 @@ fun QuickAccessCard(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         onClick = onClick
     ) {
         Row(
@@ -41,13 +44,10 @@ fun QuickAccessCard(
         ) {
 
             // Icono circular de la izquierda
-            Card(
+            Surface(
                 modifier = Modifier.size(45.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFFFE6F0)
-                ),
                 shape = CircleShape,
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                color = Color(0xFFFFE6F0)
             ) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
