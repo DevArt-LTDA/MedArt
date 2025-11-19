@@ -7,33 +7,30 @@ import androidx.room.RoomDatabase
 import medart.app.model.data.dao.UserDao
 import medart.app.model.data.entities.UserEntities
 
-class   AppDatabase {
-    @Database(
-        entities = [UserEntities::class],
-        version = 1,
-        exportSchema = false
-    )
-    abstract class AppDatabase : RoomDatabase() {
+@Database(
+    entities = [UserEntities::class],
+    version = 1,
+    exportSchema = false
+)
+abstract class AppDatabase : RoomDatabase() {
 
-        abstract fun UserDao(): UserDao
-        companion object {
-            @Volatile
-            private var INSTANCE: AppDatabase? = null
+    // nombre de método en minúscula, así podrá usar db.userDao()
+    abstract fun userDao(): UserDao
 
-            fun getDatabase(context: Context): AppDatabase {
-                return INSTANCE ?: synchronized(this) {
-                    val instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        AppDatabase::class.java,
-                        "app_db"
-                    ).build()
-                    INSTANCE = instance
-                    instance
-                }
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun getDatabase(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "app_db"
+                ).build()
+                INSTANCE = instance
+                instance
             }
         }
     }
-
-
-
 }

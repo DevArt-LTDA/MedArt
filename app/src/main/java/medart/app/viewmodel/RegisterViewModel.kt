@@ -2,20 +2,18 @@ package medart.app.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import medart.app.model.domain.RegisterUIState
-import medart.app.model.data.entities.UserEntities
-import medart.app.model.data.repository.
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import medart.app.model.data.entities.UserEntities
+import medart.app.model.data.repository.RegisterRepository
 
 data class RegisterUiState(
     val nombre: String = "",
     val apellido: String = "",
     val email: String = "",
-    val telefono: String = "",      // <- SIEMPRE STRING PARA EL TEXTFIELD
+    val telefono: String = "",      // Siempre String para el TextField
     val rut: String = "",
     val password: String = "",
 
@@ -42,10 +40,12 @@ data class RegisterUiState(
                     password.isNotBlank()
 }
 
-class RegisterViewModel(repo: RegisterRepository) : ViewModel() {
+class RegisterViewModel(
+    private val repository: RegisterRepository   // se guarda en una propiedad
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
-    val uiState: StateFlow<RegisterUiState> = _uiState
+    val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
     fun onNombreChange(value: String) {
         _uiState.value = _uiState.value.copy(
@@ -65,11 +65,11 @@ class RegisterViewModel(repo: RegisterRepository) : ViewModel() {
         val regex = Regex("^[^@]+@[^@]+\\.[^@]+$")
         _uiState.value = _uiState.value.copy(
             email = value,
-            errorEmail = if (value.isBlank()) {
-                "El correo es obligatorio"
-            } else if (!regex.matches(value)) {
-                "Correo electrónico inválido"
-            } else null
+            errorEmail = when {
+                value.isBlank() -> "El correo es obligatorio"
+                !regex.matches(value) -> "Correo electrónico inválido"
+                else -> null
+            }
         )
     }
 
@@ -77,7 +77,7 @@ class RegisterViewModel(repo: RegisterRepository) : ViewModel() {
         val digitsOnly = value.filter { it.isDigit() }
 
         _uiState.value = _uiState.value.copy(
-            telefono = digitsOnly, // solo números
+            telefono = digitsOnly,
             errorTelefono = when {
                 digitsOnly.isBlank() -> "El teléfono es obligatorio"
                 digitsOnly.length < 8 -> "Debe tener al menos 8 dígitos"
@@ -88,10 +88,14 @@ class RegisterViewModel(repo: RegisterRepository) : ViewModel() {
 
     fun onRutChange(value: String) {
         val clean = value.uppercase()
-        val rutRegex = Regex("^[0-9]{7,8}[0-9Kk]\$")
+        val rutRegex = Regex("^[0-9]{7,8}[0-9K]\$")
+
         _uiState.value = _uiState.value.copy(
             rut = clean,
-            errorRut = if (!rutRegex.matches(clean)) "RUT inválido (ej: 20345678K)" else null
+            errorRut =
+                if (!rutRegex.matches(clean))
+                    "RUT inválido (ej: 20345678K)"
+                else null
         )
     }
 
@@ -99,43 +103,57 @@ class RegisterViewModel(repo: RegisterRepository) : ViewModel() {
         _uiState.value = _uiState.value.copy(
             password = value,
             errorPassword =
-                if (value.length < 6) "La contraseña debe tener al menos 6 caracteres"
+                if (value.length < 6)
+                    "La contraseña debe tener al menos 6 caracteres"
                 else null
         )
     }
 
-    private val _estado = MutableStateFlow(RegisterUiState())
-    val estado: StateFlow<RegisterUiState> = _estado.asStateFlow()
-
     fun onEnviarFormulario() {
-        val ui = _estado.value
+        val current = _uiState.value
 
-        // Validaciones básicas
-        val errores = ui.errores.copy(
-            nombreCliente = if (ui.nombre.isBlank()) "El nombre es obligatorio" else null,
-            correoCliente = if (ui.email.isBlank()) "El correo es obligatorio" else null
+        // Revalidar por seguridad antes de enviar
+        val nombreError =
+            if (current.nombre.isBlank()) "El nombre es obligatorio" else null
+        val apellidoError =
+            if (current.apellido.isBlank()) "El apellido es obligatorio" else null
+        val emailError =
+            if (current.email.isBlank()) "El correo es obligatorio" else null
+        val telefonoError =
+            if (current.telefono.isBlank()) "El teléfono es obligatorio" else null
+        val rutError =
+            if (current.rut.isBlank()) "El RUT es obligatorio" else null
+        val passwordError =
+            if (current.password.length < 6) "La contraseña debe tener al menos 6 caracteres" else null
+
+        val validatedState = current.copy(
+            errorNombre = nombreError,
+            errorApellido = apellidoError,
+            errorEmail = emailError,
+            errorTelefono = telefonoError,
+            errorRut = rutError,
+            errorPassword = passwordError
         )
 
-        // Actualiza errores en UI
-        _estado.update { it.copy(errores = errores) }
+        _uiState.value = validatedState
 
-        // Si hay errores, no persistir
-        if (errores.tieneErrores()) return
+        if (!validatedState.isFormValid) return
 
-        // Persistir en SQLite (Room)
         viewModelScope.launch {
             val entity = UserEntities(
-                nombre = ui,
-                email = ui.email,
-
+                name = validatedState.nombre,
+                lastName = validatedState.apellido,
+                email = validatedState.email,
+                passWord = validatedState.password,
+                phone = validatedState.telefono,
+                rut = validatedState.rut
             )
-            repository.insert(entity)
 
-            // Opcional: limpiar formulario
-            _estado.update { RegisterUiState() }
+            // Aquí llamas al backend / repositorio
+            repository.registerUser(entity)
+
+            // Limpiar formulario tras registro exitoso
+            _uiState.value = RegisterUiState()
         }
     }
-
-
 }
-

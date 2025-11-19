@@ -1,18 +1,24 @@
 package medart.app.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import medart.app.domain.Reservation
+import medart.app.model.data.config.AppDatabase
+import medart.app.model.data.repository.RegisterRepository
 import medart.app.ui.screen.AppointmentScreen
 import medart.app.ui.screen.HomeScreen
 import medart.app.ui.screen.ProfileScreen
 import medart.app.ui.screen.RegisterScreen
 import medart.app.ui.screen.LoginScreen
 import medart.app.ui.screen.RutScreen
+import medart.app.viewmodel.RegisterViewModel
+import medart.app.viewmodel.RegisterViewModelFactory
 import medart.app.viewmodel.UserProfileViewModel
 
 object Routes {
@@ -73,18 +79,28 @@ fun MedArtNavGraph(
             )
         }
 
-        // REGISTER -> HOME
         composable(Routes.REGISTER) {
+            val context = LocalContext.current
+
+            // Instancia única de la BD
+            val db = remember { AppDatabase.getDatabase(context) }
+
+            val repository = remember { RegisterRepository(db.userDao()) }
+            val factory = remember { RegisterViewModelFactory(repository) }
+
+            val registerViewModel: RegisterViewModel = viewModel(factory = factory)
+
             RegisterScreen(
                 profileViewModel = profileViewModel,
+                registerViewModel = registerViewModel,
                 onRegistered = {
                     navController.navigate(Routes.HOME) {
-                        // dejamos HOME como raíz del flujo
                         popUpTo(Routes.RUT) { inclusive = true }
                     }
                 }
             )
         }
+
 
         // HOME con navbar (perfil, cerrar sesión)
         composable(Routes.HOME) {

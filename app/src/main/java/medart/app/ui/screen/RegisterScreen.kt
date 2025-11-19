@@ -1,14 +1,16 @@
 package medart.app.ui.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,31 +23,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import medart.app.R
 import medart.app.ui.components.InputText
+import medart.app.viewmodel.RegisterViewModel
 import medart.app.viewmodel.UserProfileViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
     profileViewModel: UserProfileViewModel,
+    registerViewModel: RegisterViewModel,
     onRegistered: () -> Unit
 ) {
-    var nombre by remember { mutableStateOf("") }
-    var apellido by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
-    var rut by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    // Estado que viene del ViewModel de registro
+    val uiState by registerViewModel.uiState.collectAsState()
 
     val topBlue = Color(0xFF008CFF)
     val bgLight = Color(0xFFF7FBFF)
 
-    val isFormValid =
-        nombre.isNotBlank() &&
-                apellido.isNotBlank() &&
-                email.isNotBlank() &&
-                telefono.isNotBlank() &&
-                rut.isNotBlank() &&
-                password.isNotBlank()
+    val isFormValid = uiState.isFormValid
 
     Scaffold(
         topBar = {
@@ -89,7 +83,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Título y subtítulo (mismo estilo que login)
             Text(
                 text = "Registro de paciente",
                 fontSize = 24.sp,
@@ -108,45 +101,50 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Campos de formulario
+            // Nombre
             InputText(
-                value = nombre,
-                onValueChange = { nombre = it },
+                value = uiState.nombre,
+                onValueChange = { registerViewModel.onNombreChange(it) },
                 label = "Nombre"
             )
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Apellido
             InputText(
-                value = apellido,
-                onValueChange = { apellido = it },
+                value = uiState.apellido,
+                onValueChange = { registerViewModel.onApellidoChange(it) },
                 label = "Apellido"
             )
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Email
             InputText(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.email,
+                onValueChange = { registerViewModel.onEmailChange(it) },
                 label = "Correo electrónico"
             )
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Teléfono
             InputText(
-                value = telefono,
-                onValueChange = { telefono = it },
+                value = uiState.telefono,
+                onValueChange = { registerViewModel.onTelefonoChange(it) },
                 label = "Teléfono"
             )
             Spacer(modifier = Modifier.height(12.dp))
 
+            // RUT
             InputText(
-                value = rut,
-                onValueChange = { rut = it },
+                value = uiState.rut,
+                onValueChange = { registerViewModel.onRutChange(it) },
                 label = "RUT"
             )
             Spacer(modifier = Modifier.height(12.dp))
 
+            // Password
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = uiState.password,
+                onValueChange = { registerViewModel.onPasswordChange(it) },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -167,18 +165,25 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón grande tipo MedArt / Bupa
+            // Botón
             Button(
                 onClick = {
+                    // Guarda en Room (RegisterViewModel + RegisterRepository)
+                    registerViewModel.onEnviarFormulario()
+
+                    // Opcional: seguir guardando el perfil como antes
                     profileViewModel.saveProfile(
-                        nombre = nombre,
-                        apellido = apellido,
-                        email = email,
-                        telefono = telefono,
-                        rut = rut,
-                        password = password
+                        nombre = uiState.nombre,
+                        apellido = uiState.apellido,
+                        email = uiState.email,
+                        telefono = uiState.telefono,
+                        rut = uiState.rut,
+                        password = uiState.password
                     )
-                    onRegistered()
+
+                    if (uiState.isFormValid) {
+                        onRegistered()
+                    }
                 },
                 enabled = isFormValid,
                 modifier = Modifier
