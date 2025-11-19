@@ -1,18 +1,18 @@
 package medart.app.ui.screen
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -22,21 +22,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import medart.app.R
-import androidx.compose.foundation.Image
-import androidx.compose.ui.res.painterResource
+import medart.app.viewmodel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onContinue: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    loginViewModel: LoginViewModel = viewModel()
 ) {
-    var password by rememberSaveable { mutableStateOf("") }
-    var showPassword by rememberSaveable { mutableStateOf(false) }
-
-    // regla simple: mínimo 6 caracteres
-    val isPasswordValid = password.length >= 6
+    val uiState by loginViewModel.uiState.collectAsState()
 
     val topBlue = Color(0xFF008CFF)
     val bgLight = Color(0xFFF7FBFF)
@@ -47,12 +44,10 @@ fun LoginScreen(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
 
-                        // MISMO LOGO QUE EN RutScreen
                         Image(
                             painter = painterResource(id = R.drawable.logo_devart_sin_fondo),
                             contentDescription = "Logo MedArt",
-                            modifier = Modifier
-                                .height(32.dp)
+                            modifier = Modifier.height(32.dp)
                         )
 
                         Spacer(Modifier.width(8.dp))
@@ -68,7 +63,6 @@ fun LoginScreen(
         }
     ) { innerPadding ->
 
-        // CONTENIDO CENTRADO IGUAL QUE EN RutScreen
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -118,23 +112,23 @@ fun LoginScreen(
                 Spacer(Modifier.height(6.dp))
 
                 OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
+                    value = uiState.password,
+                    onValueChange = { loginViewModel.onPasswordChange(it) },
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = { Text("Ingresa tu contraseña") },
                     singleLine = true,
-                    visualTransformation = if (showPassword)
+                    visualTransformation = if (uiState.showPassword)
                         VisualTransformation.None
                     else
                         PasswordVisualTransformation(),
                     trailingIcon = {
-                        IconButton(onClick = { showPassword = !showPassword }) {
+                        IconButton(onClick = { loginViewModel.toggleShowPassword() }) {
                             Icon(
-                                imageVector = if (showPassword)
+                                imageVector = if (uiState.showPassword)
                                     Icons.Default.VisibilityOff
                                 else
                                     Icons.Default.Visibility,
-                                contentDescription = if (showPassword)
+                                contentDescription = if (uiState.showPassword)
                                     "Ocultar contraseña"
                                 else
                                     "Mostrar contraseña"
@@ -156,8 +150,8 @@ fun LoginScreen(
 
                 // -------- BOTÓN CONTINUAR --------
                 Button(
-                    onClick = { if (isPasswordValid) onContinue() },
-                    enabled = isPasswordValid,
+                    onClick = { if (uiState.isPasswordValid) onContinue() },
+                    enabled = uiState.isPasswordValid,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
@@ -174,14 +168,13 @@ fun LoginScreen(
                     color = topBlue,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
+
                 TextButton(
                     onClick = onRegisterClick,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("¿No tienes una cuenta? Regístrate")
                 }
-
-
             }
         }
     }

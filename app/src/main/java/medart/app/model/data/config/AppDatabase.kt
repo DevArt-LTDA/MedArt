@@ -4,19 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import medart.app.model.data.dao.FormularioServicioDao
-import medart.app.model.data.entities.FormularioServicioEntity
+import medart.app.model.data.dao.UserDao
+import medart.app.model.data.entities.UserEntities
 
-class AppDatabase {
+class   AppDatabase {
     @Database(
-        entities = [FormularioServicioEntity::class],
+        entities = [UserEntities::class],
         version = 1,
         exportSchema = false
     )
     abstract class AppDatabase : RoomDatabase() {
 
-        abstract fun formularioServicioDao(): FormularioServicioDao
-
+        abstract fun UserDao(): UserDao
         companion object {
             @Volatile
             private var INSTANCE: AppDatabase? = null

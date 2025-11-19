@@ -1,22 +1,30 @@
 package medart.app.viewmodel
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import medart.app.model.domain.LoginUIState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
+data class LoginUiState(
+    val password: String = "",
+    val showPassword: Boolean = false
+) {
+
+    val isPasswordValid: Boolean
+        get() = password.length >= 8
+}
 
 class LoginViewModel : ViewModel() {
 
-    var uiState by mutableStateOf(LoginUIState())
-        private set
+    private val _uiState = MutableStateFlow(LoginUiState())
+    val uiState: StateFlow<LoginUiState> = _uiState
 
-    fun onRutChange(newRut: String) {
-        uiState = uiState.copy(rut = newRut)
+    fun onPasswordChange(newPassword: String) {
+        _uiState.value = _uiState.value.copy(password = newPassword)
     }
-//ejemplo
-    fun onPrevisionChange(newPrev: String) {
-        uiState = uiState.copy(previsionSalud = newPrev)
+
+    fun toggleShowPassword() {
+        _uiState.value = _uiState.value.copy(
+            showPassword = !_uiState.value.showPassword
+        )
     }
 }
