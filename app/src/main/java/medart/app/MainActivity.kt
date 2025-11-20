@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import medart.app.navigation.MedArtApp
 
 class MainActivity : ComponentActivity() {
-
+//Merge Branch
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
