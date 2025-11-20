@@ -9,13 +9,12 @@ class RegisterRepository(private val dao: UserDao) {
 
     fun obtenerFormularios() = dao.getFormularios()
 
-    // Nuevo método usado por el ViewModel
+    // Metodo usado por el ViewModel
     suspend fun registerUser(user: UserEntities): Long =
         withContext(Dispatchers.IO) {
             dao.insertUser(user)
         }
 
-    // (Opcional) método antiguo, por compatibilidad
     suspend fun insertUser(entity: UserEntities): Long =
         withContext(Dispatchers.IO) {
             dao.insertUser(entity)

@@ -14,7 +14,6 @@ import medart.app.model.data.entities.UserEntities
 )
 abstract class AppDatabase : RoomDatabase() {
 
-    // nombre de método en minúscula, así podrá usar db.userDao()
     abstract fun userDao(): UserDao
 
     companion object {

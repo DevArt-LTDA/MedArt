@@ -13,7 +13,7 @@ data class RegisterUiState(
     val nombre: String = "",
     val apellido: String = "",
     val email: String = "",
-    val telefono: String = "",      // Siempre String para el TextField
+    val telefono: String = "",
     val rut: String = "",
     val password: String = "",
 
@@ -41,7 +41,7 @@ data class RegisterUiState(
 }
 
 class RegisterViewModel(
-    private val repository: RegisterRepository   // se guarda en una propiedad
+    private val repository: RegisterRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -112,7 +112,6 @@ class RegisterViewModel(
     fun onEnviarFormulario() {
         val current = _uiState.value
 
-        // Revalidar por seguridad antes de enviar
         val nombreError =
             if (current.nombre.isBlank()) "El nombre es obligatorio" else null
         val apellidoError =
@@ -149,10 +148,8 @@ class RegisterViewModel(
                 rut = validatedState.rut
             )
 
-            // Aquí llamas al backend / repositorio
             repository.registerUser(entity)
 
-            // Limpiar formulario tras registro exitoso
             _uiState.value = RegisterUiState()
         }
     }
