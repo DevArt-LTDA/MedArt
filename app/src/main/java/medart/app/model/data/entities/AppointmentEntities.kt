@@ -8,9 +8,9 @@ import androidx.room.PrimaryKey
 data class AppointmentEntities(
     @PrimaryKey(autoGenerate = true)
     val rut: String,
-    val name: String,
-    val lastName: String,
-    val email: String,
-    val phone: Int,
-    val passWord: String
+    val prevision: String,
+    val especialidad: String,
+    val centroMedico: String,
+    val fecha: String,
+    val hora: String
 )

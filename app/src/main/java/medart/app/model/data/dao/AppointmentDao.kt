@@ -11,9 +11,9 @@ import kotlinx.coroutines.flow.Flow
 interface AppointmentDao {
 
     @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
-    suspend fun insertUser(appointment: AppointmentEntities): Long
+    suspend fun insertAppointment(appointment: AppointmentEntities): Long
 
-    @Query("SELECT * FROM USERS ORDER BY rut DESC")
+    @Query("SELECT * FROM APPOINTMENTS ORDER BY rut DESC")
     fun getFormularios(): Flow<List<AppointmentEntities>>
 
     @Query("DELETE FROM Appointments")

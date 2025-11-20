@@ -1,150 +1,210 @@
 package medart.app.ui.screen
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.foundation.clickable
+
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import medart.app.R
+import medart.app.ui.components.Dropdown
+import medart.app.viewmodel.AppointmentViewModel
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.unit.dp
-import medart.app.domain.Reservation
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppointmentScreen(onConfirmReservation: (Reservation) -> Unit) {
-
-    // Especialidades de ejemplo
-    val specialties = listOf(
-        "Medicina general",
-        "Pediatría",
-        "Ginecología",
-        "Traumatología",
-        "Psicólogo",
-        "Psiquiatra",
-        "Kinesiología",
-        "Otro"
-    )
-
-    // Horarios de ejemplo
-    val times = listOf(
-        "09:00", "09:30", "10:00", "10:30",
-        "11:00", "11:30", "12:00",
-        "15:00", "15:30", "16:00", "16:30", "17:00"
-    )
-
-    var selectedSpecialty by remember { mutableStateOf("") }
-    var selectedTime by remember { mutableStateOf("") }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-
-        // Dropdown especialidad
-        DropdownField(
-            label = "Especialidad",
-            value = selectedSpecialty,
-            options = specialties,
-            onValueChange = { selectedSpecialty = it }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Dropdown horario
-        DropdownField(
-            label = "Horario",
-            value = selectedTime,
-            options = times,
-            onValueChange = { selectedTime = it }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = {
-                // Aquí podrás guardar la hora médica o navegar a un resumen
-            },
-            enabled = selectedSpecialty.isNotBlank() && selectedTime.isNotBlank(),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Confirmar hora")
-        }
-    }
-
-    Button(
-        onClick = {
-            val reservation = Reservation(
-                id = (System.currentTimeMillis() and 0xFFFFFFF).toInt(),
-                especialidad = selectedSpecialty,
-                horario = selectedTime
-            )
-            onConfirmReservation(reservation)
-        },
-        enabled = selectedSpecialty.isNotBlank() && selectedTime.isNotBlank(),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text("Confirmar hora")
-    }
-
-}
-
-/**
- * Campo genérico con Dropdown usando material3.DropdownMenu
- */
-@Composable
-private fun DropdownField(
-    label: String,
-    value: String,
-    options: List<String>,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+fun AppointmentScreen(
+    appointmentViewModel: AppointmentViewModel,
+    onConfirmReserva: () -> Unit,
+    onBack: () -> Unit = {}
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    val uiState by appointmentViewModel.uiState.collectAsState()
 
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.TopStart
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { },
-            readOnly = true,
-            label = { Text(label) },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = true }
-        )
+    val topBlue = Color(0xFF008CFF)
+    val bgLight = Color(0xFFF7FBFF)
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(option) },
-                    onClick = {
-                        onValueChange(option)
-                        expanded = false
+    val isFormValid = uiState.isFormValid
+
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Volver",
+                            tint = topBlue
+                        )
                     }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.White
+                ),
+                title = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_devart_sin_fondo),
+                            contentDescription = "Logo MedArt",
+                            modifier = Modifier.height(32.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "MedArt",
+                            color = topBlue,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+            )
+        },
+        containerColor = bgLight
+    ) { innerPadding ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            // -------- TITULO --------
+            Text(
+                text = "Reserva tu atención",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = "Selecciona tu previsión, especialidad y centro médico para continuar.",
+                fontSize = 14.sp,
+                textAlign = TextAlign.Center,
+                color = Color(0xFF555555)
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            // -------- CARD FORM --------
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                color = Color.White,
+                tonalElevation = 2.dp,
+                shadowElevation = 4.dp
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+
+                    Text(
+                        text = "Datos de la reserva",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = topBlue
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // =============================
+                    //    PREVISION
+                    // =============================
+                    Dropdown(
+                        label = "Previsión de salud",
+                        value = uiState.prevision,
+                        options = listOf("Fonasa", "Isapre", "Particular"),
+                        onSelect = { appointmentViewModel.onPrevisionChange(it) }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // =============================
+                    //    ESPECIALIDAD
+                    // =============================
+                    Dropdown(
+                        label = "Especialidad",
+                        value = uiState.especialidad,
+                        options = listOf("Medicina General", "Pediatría", "Cardiología", "Traumatología"),
+                        onSelect = { appointmentViewModel.onEspecialidadChange(it) }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // =============================
+                    //    CENTRO MEDICO
+                    // =============================
+                    Dropdown(
+                        label = "Centro médico",
+                        value = uiState.centro,
+                        options = listOf(
+                            "Centro Médico MedArt Santiago",
+                            "Centro Médico MedArt Maipú",
+                            "Centro Médico MedArt La Florida"
+                        ),
+                        onSelect = { appointmentViewModel.onCentroChange(it) }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // =============================
+                    //    FECHA
+                    // =============================
+                    Dropdown(
+                        label = "Fecha",
+                        value = uiState.fecha,
+                        options = listOf("8/11/2025", "10/12/2025", "17/11/2025", "20/11/2025", "30/12/2026"),
+                        onSelect = { appointmentViewModel.onFechaChange(it) }
+                    )
+
+                    Spacer(Modifier.height(16.dp))
+
+                    // =============================
+                    //    HORA
+                    // =============================
+                    Dropdown(
+                        label = "Hora",
+                        value = uiState.hora,
+                        options = listOf("9:00 AM", "11:30 AM", "10:20 AM", "3:00 PM", "1:00 PM"),
+                        onSelect = { appointmentViewModel.onHoraChange(it) }
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            // -------- BOTÓN --------
+            Button(
+                onClick = {
+                    appointmentViewModel.onEnviarReserva()
+                    if (isFormValid) onConfirmReserva()
+                },
+                enabled = isFormValid,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                shape = RoundedCornerShape(24.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (isFormValid) topBlue else Color(0xFFE0E0E0),
+                    contentColor = if (isFormValid) Color.White else Color(0xFF999999)
                 )
+            ) {
+                Text("Confirmar reserva")
             }
         }
     }

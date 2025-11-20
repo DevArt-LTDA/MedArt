@@ -119,13 +119,15 @@ fun MedArtNavGraph(
         }
 
 
+
+
         // Confirmar hora -> guarda reserva y vuelve a HOME
         composable(Routes.APPOINTMENT) {
             AppointmentScreen(
-                onConfirmReservation = { reservation: Reservation ->
-                    profileViewModel.addReservation(reservation)
-                    navController.popBackStack(Routes.HOME, inclusive = false)
-                }
+                onConfirmReserva = { prevision, especialidad, centro ->
+                    // aquí sigues el flujo: guardar en ViewModel, navegar, etc.
+                },
+                onBack = { navController.popBackStack() }
             )
         }
 
