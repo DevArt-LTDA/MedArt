@@ -80,7 +80,6 @@ fun AppointmentScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // -------- TITULO --------
             Text(
                 text = "Reserva tu atención",
                 fontSize = 22.sp,
@@ -99,7 +98,6 @@ fun AppointmentScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // -------- CARD FORM --------
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -122,10 +120,6 @@ fun AppointmentScreen(
 
                     Spacer(Modifier.height(16.dp))
 
-                    // =============================
-                    //    PREVISION
-                    // =============================
-                    // PREVISIÓN
                     Dropdown(
                         label = "Previsión de salud",
                         selectedValue = uiState.prevision,
@@ -133,7 +127,6 @@ fun AppointmentScreen(
                         onSelect = { appointmentViewModel.onPrevisionChange(it) }
                     )
 
-// ESPECIALIDAD
                     Dropdown(
                         label = "Especialidad",
                         selectedValue = uiState.especialidad,
@@ -146,19 +139,18 @@ fun AppointmentScreen(
                         onSelect = { appointmentViewModel.onEspecialidadChange(it) }
                     )
 
-// CENTRO MÉDICO
+
                     Dropdown(
                         label = "Centro médico",
                         selectedValue = uiState.centro,
                         options = listOf(
-                            "Centro Médico MedArt Santiago",
-                            "Centro Médico MedArt Maipú",
-                            "Centro Médico MedArt La Florida"
+                            "Clinica Santiago",
+                            "Centro Médico Maipú",
+                            "Clinica La Florida"
                         ),
                         onSelect = { appointmentViewModel.onCentroChange(it) }
                     )
 
-// FECHA
                     Dropdown(
                         label = "Fecha",
                         selectedValue = uiState.fecha,
@@ -172,7 +164,6 @@ fun AppointmentScreen(
                         onSelect = { appointmentViewModel.onFechaChange(it) }
                     )
 
-// HORA
                     Dropdown(
                         label = "Hora",
                         selectedValue = uiState.hora,
@@ -182,7 +173,6 @@ fun AppointmentScreen(
 
                     Spacer(Modifier.height(24.dp))
 
-                    // -------- BOTÓN --------
                     Button(
                         onClick = {
                             appointmentViewModel.onEnviarReserva()
