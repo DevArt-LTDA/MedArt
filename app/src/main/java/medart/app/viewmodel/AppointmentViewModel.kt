@@ -1,64 +1,53 @@
+// medart/app/viewmodel/AppointmentViewModel.kt
 package medart.app.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import medart.app.model.data.entities.AppointmentEntities
-import medart.app.model.data.repository.AppointmentRepository
-import medart.app.model.domain.AppointmentUiState
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 
-class AppointmentViewModel(
-    private val repository: AppointmentRepository
-) : ViewModel() {
+data class AppointmentUiState(
+    val prevision: String = "",
+    val especialidad: String = "",
+    val centro: String = "",
+    val fecha: String = "",
+    val hora: String = "",
+) {
+    val isFormValid: Boolean
+        get() = prevision.isNotBlank() &&
+                especialidad.isNotBlank() &&
+                centro.isNotBlank() &&
+                fecha.isNotBlank() &&
+                hora.isNotBlank()
+}
+
+class AppointmentViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(AppointmentUiState())
-    val uiState: StateFlow<AppointmentUiState> = _uiState
-
-    // --- Cambios por campo ---
-
-    fun onRutChange(value: String) {
-        _uiState.value = _uiState.value.copy(rut = value)
-    }
+    val uiState: StateFlow<AppointmentUiState> = _uiState.asStateFlow()
 
     fun onPrevisionChange(value: String) {
-        _uiState.value = _uiState.value.copy(prevision = value)
+        _uiState.update { it.copy(prevision = value) }
     }
 
     fun onEspecialidadChange(value: String) {
-        _uiState.value = _uiState.value.copy(especialidad = value)
+        _uiState.update { it.copy(especialidad = value) }
     }
 
     fun onCentroChange(value: String) {
-        _uiState.value = _uiState.value.copy(centro = value)
+        _uiState.update { it.copy(centro = value) }
     }
 
     fun onFechaChange(value: String) {
-        _uiState.value = _uiState.value.copy(fecha = value)
+        _uiState.update { it.copy(fecha = value) }
     }
 
     fun onHoraChange(value: String) {
-        _uiState.value = _uiState.value.copy(hora = value)
+        _uiState.update { it.copy(hora = value) }
     }
 
-    // --- Guardar en Room ---
-
     fun onEnviarReserva() {
-        val state = _uiState.value
-        if (!state.isFormValid) return
-
-        val newReserva = AppointmentEntities(
-            rut = state.rut,
-            prevision = state.prevision,
-            especialidad = state.especialidad,
-            centroMedico = state.centro,
-            fecha = state.fecha,
-            hora = state.hora
-        )
-
-        viewModelScope.launch {
-            repository.insert(newReserva)
-        }
+        // De momento solo valida / podría hacer log, etc.
     }
 }

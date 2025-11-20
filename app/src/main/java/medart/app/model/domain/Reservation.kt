@@ -1,11 +1,9 @@
-package medart.app.model.domain
-
+package medart.app.domain
 data class Reservation(
-    val id: Long = 0,
-    val rut: String = "",
-    val prevision: String = "",
-    val especialidad: String = "",
-    val centroMedico: String = "",
-    val fecha: String = "",
-    val hora: String = ""
+    val prevision: String,
+    val especialidad: String,
+    val centro: String,
+    val fecha: String,
+    val hora: String
 )
+

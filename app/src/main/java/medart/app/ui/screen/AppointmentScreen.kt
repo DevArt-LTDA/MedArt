@@ -125,33 +125,31 @@ fun AppointmentScreen(
                     // =============================
                     //    PREVISION
                     // =============================
+                    // PREVISIÓN
                     Dropdown(
                         label = "Previsión de salud",
-                        value = uiState.prevision,
+                        selectedValue = uiState.prevision,
                         options = listOf("Fonasa", "Isapre", "Particular"),
                         onSelect = { appointmentViewModel.onPrevisionChange(it) }
                     )
 
-                    Spacer(Modifier.height(16.dp))
-
-                    // =============================
-                    //    ESPECIALIDAD
-                    // =============================
+// ESPECIALIDAD
                     Dropdown(
                         label = "Especialidad",
-                        value = uiState.especialidad,
-                        options = listOf("Medicina General", "Pediatría", "Cardiología", "Traumatología"),
+                        selectedValue = uiState.especialidad,
+                        options = listOf(
+                            "Medicina General",
+                            "Pediatría",
+                            "Cardiología",
+                            "Traumatología"
+                        ),
                         onSelect = { appointmentViewModel.onEspecialidadChange(it) }
                     )
 
-                    Spacer(Modifier.height(16.dp))
-
-                    // =============================
-                    //    CENTRO MEDICO
-                    // =============================
+// CENTRO MÉDICO
                     Dropdown(
                         label = "Centro médico",
-                        value = uiState.centro,
+                        selectedValue = uiState.centro,
                         options = listOf(
                             "Centro Médico MedArt Santiago",
                             "Centro Médico MedArt Maipú",
@@ -160,51 +158,49 @@ fun AppointmentScreen(
                         onSelect = { appointmentViewModel.onCentroChange(it) }
                     )
 
-                    Spacer(Modifier.height(16.dp))
-
-                    // =============================
-                    //    FECHA
-                    // =============================
+// FECHA
                     Dropdown(
                         label = "Fecha",
-                        value = uiState.fecha,
-                        options = listOf("8/11/2025", "10/12/2025", "17/11/2025", "20/11/2025", "30/12/2026"),
+                        selectedValue = uiState.fecha,
+                        options = listOf(
+                            "8/11/2025",
+                            "10/12/2025",
+                            "17/11/2025",
+                            "20/11/2025",
+                            "30/12/2026"
+                        ),
                         onSelect = { appointmentViewModel.onFechaChange(it) }
                     )
 
-                    Spacer(Modifier.height(16.dp))
-
-                    // =============================
-                    //    HORA
-                    // =============================
+// HORA
                     Dropdown(
                         label = "Hora",
-                        value = uiState.hora,
+                        selectedValue = uiState.hora,
                         options = listOf("9:00 AM", "11:30 AM", "10:20 AM", "3:00 PM", "1:00 PM"),
                         onSelect = { appointmentViewModel.onHoraChange(it) }
                     )
+
+                    Spacer(Modifier.height(24.dp))
+
+                    // -------- BOTÓN --------
+                    Button(
+                        onClick = {
+                            appointmentViewModel.onEnviarReserva()
+                            if (isFormValid) onConfirmReserva()
+                        },
+                        enabled = isFormValid,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isFormValid) topBlue else Color(0xFFE0E0E0),
+                            contentColor = if (isFormValid) Color.White else Color(0xFF999999)
+                        )
+                    ) {
+                        Text("Confirmar reserva")
+                    }
                 }
-            }
-
-            Spacer(Modifier.height(24.dp))
-
-            // -------- BOTÓN --------
-            Button(
-                onClick = {
-                    appointmentViewModel.onEnviarReserva()
-                    if (isFormValid) onConfirmReserva()
-                },
-                enabled = isFormValid,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(24.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (isFormValid) topBlue else Color(0xFFE0E0E0),
-                    contentColor = if (isFormValid) Color.White else Color(0xFF999999)
-                )
-            ) {
-                Text("Confirmar reserva")
             }
         }
     }

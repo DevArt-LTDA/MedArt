@@ -88,11 +88,14 @@ fun ProfileScreen(
                                     .fillMaxWidth()
                                     .padding(12.dp)
                             ) {
-                                Text(text = res.tipoAtencion)
+                                Text(text = "Previsión: ${res.prevision}")
                                 Text(text = "Especialidad: ${res.especialidad}")
-                                Text(text = "Horario: ${res.horario}")
+                                Text(text = "Centro: ${res.centro}")
+                                Text(text = "Fecha: ${res.fecha}")
+                                Text(text = "Hora: ${res.hora}")
                             }
                         }
+
                     }
                 }
             }

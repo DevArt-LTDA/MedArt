@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import medart.app.domain.Reservation
+import medart.app.viewmodel.AppointmentViewModel
 import medart.app.model.data.config.AppDatabase
 import medart.app.model.data.repository.RegisterRepository
 import medart.app.ui.screen.AppointmentScreen
@@ -121,15 +121,21 @@ fun MedArtNavGraph(
 
 
 
-        // Confirmar hora -> guarda reserva y vuelve a HOME
+// Confirmar hora -> guarda reserva y vuelve a HOME
         composable(Routes.APPOINTMENT) {
+            val appointmentViewModel: AppointmentViewModel = viewModel()
+
             AppointmentScreen(
-                onConfirmReserva = { prevision, especialidad, centro ->
-                    // aquí sigues el flujo: guardar en ViewModel, navegar, etc.
+                appointmentViewModel = appointmentViewModel,
+                onConfirmReserva = {
+                    navController.popBackStack(Routes.HOME, inclusive = false)
                 },
                 onBack = { navController.popBackStack() }
             )
         }
+
+
+
 
         // Perfil: ver datos y reservas
         composable(Routes.PROFILE) {

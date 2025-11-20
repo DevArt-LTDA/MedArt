@@ -1,6 +1,5 @@
 package medart.app.ui.components
 
-import androidx.compose.runtime.Composable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -14,12 +13,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import medart.app.domain.Reservation
+import medart.app.domain.Reservation   // <- ojo con el package de Reservation
 
 @Composable
-fun AppointmentCardSimple(appointment: Appointment) {
+fun AppointmentCardSimple(reservation: Reservation) {
     val topBlue = Color(0xFF007ACC)
 
     Surface(
@@ -32,10 +32,9 @@ fun AppointmentCardSimple(appointment: Appointment) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
-
             // Especialidad
             Text(
-                text = reserva.especialidad,
+                text = reservation.especialidad,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -51,7 +50,7 @@ fun AppointmentCardSimple(appointment: Appointment) {
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = reserva.centro,
+                    text = reservation.centro,
                     fontSize = 14.sp,
                     color = Color.DarkGray
                 )
@@ -72,7 +71,7 @@ fun AppointmentCardSimple(appointment: Appointment) {
                         tint = topBlue
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text(reserva.fecha)
+                    Text(reservation.fecha)
                 }
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -82,7 +81,7 @@ fun AppointmentCardSimple(appointment: Appointment) {
                         tint = topBlue
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text(reserva.hora)
+                    Text(reservation.hora)
                 }
             }
         }
