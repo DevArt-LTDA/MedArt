@@ -113,7 +113,7 @@ fun AppointmentScreen(
 
                     Text(
                         text = "Datos de la reserva",
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = topBlue
                     )
@@ -126,6 +126,7 @@ fun AppointmentScreen(
                         options = listOf("Fonasa", "Isapre", "Particular"),
                         onSelect = { appointmentViewModel.onPrevisionChange(it) }
                     )
+                    Spacer(Modifier.height(16.dp))
 
                     Dropdown(
                         label = "Especialidad",
@@ -138,7 +139,7 @@ fun AppointmentScreen(
                         ),
                         onSelect = { appointmentViewModel.onEspecialidadChange(it) }
                     )
-
+                    Spacer(Modifier.height(16.dp))
 
                     Dropdown(
                         label = "Centro médico",
@@ -150,6 +151,7 @@ fun AppointmentScreen(
                         ),
                         onSelect = { appointmentViewModel.onCentroChange(it) }
                     )
+                    Spacer(Modifier.height(16.dp))
 
                     Dropdown(
                         label = "Fecha",
@@ -163,6 +165,7 @@ fun AppointmentScreen(
                         ),
                         onSelect = { appointmentViewModel.onFechaChange(it) }
                     )
+                    Spacer(Modifier.height(16.dp))
 
                     Dropdown(
                         label = "Hora",
@@ -171,7 +174,7 @@ fun AppointmentScreen(
                         onSelect = { appointmentViewModel.onHoraChange(it) }
                     )
 
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(30.dp))
 
                     Button(
                         onClick = {
