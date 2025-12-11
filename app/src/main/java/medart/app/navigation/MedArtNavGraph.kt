@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import medart.app.viewmodel.AppointmentViewModel
 import medart.app.model.data.config.AppDatabase
+import medart.app.model.data.dao.AppointmentDao
 import medart.app.model.data.repository.AppointmentRepository
 import medart.app.model.data.repository.RegisterRepository
 import medart.app.ui.screen.AppointmentScreen
@@ -101,6 +102,26 @@ fun MedArtNavGraph(
             )
         }
 
+// Confirmar hora -> guarda reserva y vuelve a HOME
+        composable(Routes.APPOINTMENT) {
+            val context = LocalContext.current
+            val db = remember { AppDatabase.getDatabase(context) }
+
+            val repository = remember { AppointmentRepository(db.appointmentDao()) }
+            val factory = remember { AppointmentViewModelFactory(repository) }
+            val appointmentViewModel: AppointmentViewModel = viewModel(factory = factory)
+
+
+            AppointmentScreen(
+                appointmentViewModel = appointmentViewModel,
+                onConfirmReserva = {
+                    navController.popBackStack(Routes.HOME, inclusive = false)
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+
 
         // HOME con navbar (perfil, cerrar sesión)
         composable(Routes.HOME) {
@@ -121,20 +142,6 @@ fun MedArtNavGraph(
 
 
 
-// Confirmar hora -> guarda reserva y vuelve a HOME
-        composable(Routes.APPOINTMENT) {
-            val context = LocalContext.current
-
-
-
-            AppointmentScreen(
-                appointmentViewModel = appointmentViewModel,
-                onConfirmReserva = {
-                    navController.popBackStack(Routes.HOME, inclusive = false)
-                },
-                onBack = { navController.popBackStack() }
-            )
-        }
 
 
 

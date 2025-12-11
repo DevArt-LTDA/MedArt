@@ -8,8 +8,36 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import medart.app.model.data.entities.AppointmentEntities
 import medart.app.model.data.repository.AppointmentRepository
-import medart.app.model.domain.AppointmentUiState
 
+// Estado de la pantalla (equivalente a RegisterUiState)
+data class AppointmentUiState(
+    val prevision: String = "",
+    val especialidad: String = "",
+    val centro: String = "",
+    val fecha: String = "",
+    val hora: String = "",
+
+    val errorPrevision: String? = null,
+    val errorEspecialidad: String? = null,
+    val errorCentro: String? = null,
+    val errorFecha: String? = null,
+    val errorHora: String? = null
+) {
+    val isFormValid: Boolean
+        get() =
+            errorPrevision == null &&
+                    errorEspecialidad == null &&
+                    errorCentro == null &&
+                    errorFecha == null &&
+                    errorHora == null &&
+                    prevision.isNotBlank() &&
+                    especialidad.isNotBlank() &&
+                    centro.isNotBlank() &&
+                    fecha.isNotBlank() &&
+                    hora.isNotBlank()
+}
+
+// ViewModel (ya NO es data class)
 class AppointmentViewModel(
     private val repository: AppointmentRepository
 ) : ViewModel() {
@@ -17,7 +45,7 @@ class AppointmentViewModel(
     private val _uiState = MutableStateFlow(AppointmentUiState())
     val uiState: StateFlow<AppointmentUiState> = _uiState.asStateFlow()
 
-    // Opcional: listar reservas
+    // Si tu repositorio expone un Flow/LiveData de reservas, lo puedes exponer así
     val reservas = repository.obtenerReservas()
 
     fun onPrevisionChange(value: String) {
@@ -59,14 +87,20 @@ class AppointmentViewModel(
         val current = _uiState.value
 
         val validatedState = current.copy(
-            errorPrevision = if (current.prevision.isBlank()) "La previsión es obligatoria" else null,
-            errorEspecialidad = if (current.especialidad.isBlank()) "La especialidad es obligatoria" else null,
-            errorCentro = if (current.centro.isBlank()) "El centro médico es obligatorio" else null,
-            errorFecha = if (current.fecha.isBlank()) "La fecha es obligatoria" else null,
-            errorHora = if (current.hora.isBlank()) "La hora es obligatoria" else null
+            errorPrevision =
+                if (current.prevision.isBlank()) "La previsión es obligatoria" else null,
+            errorEspecialidad =
+                if (current.especialidad.isBlank()) "La especialidad es obligatoria" else null,
+            errorCentro =
+                if (current.centro.isBlank()) "El centro médico es obligatorio" else null,
+            errorFecha =
+                if (current.fecha.isBlank()) "La fecha es obligatoria" else null,
+            errorHora =
+                if (current.hora.isBlank()) "La hora es obligatoria" else null
         )
 
         _uiState.value = validatedState
+
         if (!validatedState.isFormValid) return
 
         viewModelScope.launch {
@@ -79,7 +113,9 @@ class AppointmentViewModel(
             )
 
             repository.insertAppointment(entity)
-            _uiState.value = AppointmentUiState() // limpiar formulario
+
+            // Limpiar formulario después de guardar
+            _uiState.value = AppointmentUiState()
         }
     }
 }
