@@ -1,18 +1,21 @@
 package medart.app.model.data.repository
 
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import medart.app.model.data.dao.AppointmentDao
 import medart.app.model.data.entities.AppointmentEntities
 
 class AppointmentRepository(private val dao: AppointmentDao) {
 
-    suspend fun insert(appointment: AppointmentEntities): Long {
-        return dao.insertAppointment(appointment)
-    }
+    fun obtenerReservas() = dao.getAppointments()
 
-    fun getAppointments(): Flow<List<AppointmentEntities>> {
-        return dao.getFormularios()
-    }
+    suspend fun insertAppointment(entity: AppointmentEntities): Long =
+        withContext(Dispatchers.IO) {
+            dao.insertAppointment(entity)
+        }
 
-    suspend fun clear() = dao.deleteAll()
+    suspend fun limpiar() =
+        withContext(Dispatchers.IO) {
+            dao.deleteAll()
+        }
 }

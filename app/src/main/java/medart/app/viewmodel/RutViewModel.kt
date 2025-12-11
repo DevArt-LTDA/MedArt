@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 data class RutUiState(
     val rut: String = ""
 ) {
-    // Aquí vive la VALIDACIÓN
     val isRutValid: Boolean
         get() = Regex("^[0-9]{7,8}[0-9Kk]\$").matches(rut)
 }

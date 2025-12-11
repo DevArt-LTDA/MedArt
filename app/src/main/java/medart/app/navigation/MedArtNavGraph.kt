@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import medart.app.viewmodel.AppointmentViewModel
 import medart.app.model.data.config.AppDatabase
+import medart.app.model.data.repository.AppointmentRepository
 import medart.app.model.data.repository.RegisterRepository
 import medart.app.ui.screen.AppointmentScreen
 import medart.app.ui.screen.HomeScreen
@@ -17,6 +18,7 @@ import medart.app.ui.screen.ProfileScreen
 import medart.app.ui.screen.RegisterScreen
 import medart.app.ui.screen.LoginScreen
 import medart.app.ui.screen.RutScreen
+import medart.app.viewmodel.AppointmentViewModelFactory
 import medart.app.viewmodel.RegisterViewModel
 import medart.app.viewmodel.RegisterViewModelFactory
 import medart.app.viewmodel.UserProfileViewModel
@@ -30,9 +32,7 @@ object Routes {
     const val PROFILE = "profile"
 }
 
-/**
- * Esta es la función que debe llamar MainActivity.
- */
+
 @Composable
 fun MedArtApp() {
     val navController = rememberNavController()
@@ -123,7 +123,9 @@ fun MedArtNavGraph(
 
 // Confirmar hora -> guarda reserva y vuelve a HOME
         composable(Routes.APPOINTMENT) {
-            val appointmentViewModel: AppointmentViewModel = viewModel()
+            val context = LocalContext.current
+
+
 
             AppointmentScreen(
                 appointmentViewModel = appointmentViewModel,
