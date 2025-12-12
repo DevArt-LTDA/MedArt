@@ -107,7 +107,7 @@ class AppointmentViewModel(
             val entity = AppointmentEntities(
                 prevision = validatedState.prevision,
                 especialidad = validatedState.especialidad,
-                centroMedico = validatedState.centro,
+                centro = validatedState.centro,
                 fecha = validatedState.fecha,
                 hora = validatedState.hora
             )

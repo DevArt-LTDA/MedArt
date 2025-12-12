@@ -10,7 +10,7 @@ data class AppointmentEntities(
     val id: Int = 0,
     val prevision: String,
     val especialidad: String,
-    val centroMedico: String,
+    val centro: String,
     val fecha: String,
     val hora: String
 )

@@ -23,6 +23,7 @@ fun HomeScreen(
     onConsultaMedicaClick: () -> Unit,
     onExamenesClick: () -> Unit,
     onVerPerfil: () -> Unit,
+    onProximasCitasClick: () -> Unit,
     onLogout: () -> Unit
 ) {
     val profile = profileViewModel.profile
@@ -87,6 +88,7 @@ fun HomeScreen(
                 title = "Próximas citas",
                 subtitle = "Revisa el detalle de tus reservas",
                 icon = Icons.Default.CalendarToday,
+                onClick = onProximasCitasClick,
                 modifier = Modifier.fillMaxWidth()
             )
 

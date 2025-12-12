@@ -8,17 +8,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import medart.app.viewmodel.AppointmentViewModel
 import medart.app.model.data.config.AppDatabase
-import medart.app.model.data.dao.AppointmentDao
 import medart.app.model.data.repository.AppointmentRepository
 import medart.app.model.data.repository.RegisterRepository
 import medart.app.ui.screen.AppointmentScreen
 import medart.app.ui.screen.HomeScreen
+import medart.app.ui.screen.LoginScreen
 import medart.app.ui.screen.ProfileScreen
 import medart.app.ui.screen.RegisterScreen
-import medart.app.ui.screen.LoginScreen
 import medart.app.ui.screen.RutScreen
+import medart.app.ui.screen.UpcomingAppointmentsScreen
+import medart.app.viewmodel.AppointmentViewModel
 import medart.app.viewmodel.AppointmentViewModelFactory
 import medart.app.viewmodel.RegisterViewModel
 import medart.app.viewmodel.RegisterViewModelFactory
@@ -30,9 +30,9 @@ object Routes {
     const val REGISTER = "register"
     const val HOME = "home"
     const val APPOINTMENT = "appointment"
+    const val UPCOMING = "upcoming"
     const val PROFILE = "profile"
 }
-
 
 @Composable
 fun MedArtApp() {
@@ -58,37 +58,29 @@ fun MedArtNavGraph(
         // RUT -> LOGIN
         composable(Routes.RUT) {
             RutScreen(
-                onContinue = {
-                    navController.navigate(Routes.LOGIN)
-                }
+                onContinue = { navController.navigate(Routes.LOGIN) }
             )
         }
 
-        // LOGIN: contraseña + botón "Registrarse"
+        // LOGIN
         composable(Routes.LOGIN) {
             LoginScreen(
                 onContinue = {
-                    // si más adelante validas credenciales, aquí vas al HOME
                     navController.navigate(Routes.HOME) {
-                        // opcional: limpiar RUT y LOGIN del backstack
                         popUpTo(Routes.RUT) { inclusive = true }
                     }
                 },
-                onRegisterClick = {
-                    navController.navigate(Routes.REGISTER)
-                }
+                onRegisterClick = { navController.navigate(Routes.REGISTER) }
             )
         }
 
+        // REGISTER
         composable(Routes.REGISTER) {
             val context = LocalContext.current
-
-            // Instancia única de la BD
             val db = remember { AppDatabase.getDatabase(context) }
 
             val repository = remember { RegisterRepository(db.userDao()) }
             val factory = remember { RegisterViewModelFactory(repository) }
-
             val registerViewModel: RegisterViewModel = viewModel(factory = factory)
 
             RegisterScreen(
@@ -102,7 +94,7 @@ fun MedArtNavGraph(
             )
         }
 
-// Confirmar hora -> guarda reserva y vuelve a HOME
+        // APPOINTMENT (formulario para crear reserva)
         composable(Routes.APPOINTMENT) {
             val context = LocalContext.current
             val db = remember { AppDatabase.getDatabase(context) }
@@ -110,7 +102,6 @@ fun MedArtNavGraph(
             val repository = remember { AppointmentRepository(db.appointmentDao()) }
             val factory = remember { AppointmentViewModelFactory(repository) }
             val appointmentViewModel: AppointmentViewModel = viewModel(factory = factory)
-
 
             AppointmentScreen(
                 appointmentViewModel = appointmentViewModel,
@@ -121,32 +112,33 @@ fun MedArtNavGraph(
             )
         }
 
+        //UPCOMING
+        composable(Routes.UPCOMING) {
+            val context = LocalContext.current
+            val db = remember { AppDatabase.getDatabase(context) }
 
+            val repository = remember { AppointmentRepository(db.appointmentDao()) }
+            val factory = remember { AppointmentViewModelFactory(repository) }
+            val appointmentViewModel: AppointmentViewModel = viewModel(factory = factory)
 
-        // HOME con navbar (perfil, cerrar sesión)
+            UpcomingAppointmentsScreen(
+                appointmentViewModel = appointmentViewModel
+            )
+        }
+
+        // HOME
         composable(Routes.HOME) {
             HomeScreen(
                 profileViewModel = profileViewModel,
-                onConsultaMedicaClick = {
-                    navController.navigate(Routes.APPOINTMENT)
-                },
-                onExamenesClick = {
-                    // TODO: navegar a pantalla de Exámenes cuando la crees
-                    // navController.navigate(Routes.EXAMENES)
-                },
+                onConsultaMedicaClick = { navController.navigate(Routes.APPOINTMENT) },
+                onExamenesClick = { /* TODO */ },
+                onProximasCitasClick = { navController.navigate(Routes.UPCOMING) },
                 onVerPerfil = { navController.navigate(Routes.PROFILE) },
                 onLogout = { navController.navigate(Routes.RUT) }
             )
         }
 
-
-
-
-
-
-
-
-        // Perfil: ver datos y reservas
+        // PROFILE
         composable(Routes.PROFILE) {
             ProfileScreen(
                 profileViewModel = profileViewModel,
