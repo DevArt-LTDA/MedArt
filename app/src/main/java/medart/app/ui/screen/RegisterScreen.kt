@@ -5,10 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,7 +34,6 @@ fun RegisterScreen(
     registerViewModel: RegisterViewModel,
     onRegistered: () -> Unit
 ) {
-    // Estado que viene del ViewModel de registro
     val uiState by registerViewModel.uiState.collectAsState()
 
     val topBlue = Color(0xFF008CFF)
@@ -41,11 +41,28 @@ fun RegisterScreen(
 
     val isFormValid = uiState.isFormValid
 
+    // ✅ Navegar solo cuando el ViewModel confirme guardado (saved=true)
+    LaunchedEffect(uiState.saved) {
+        if (uiState.saved) {
+            // Mantener perfil en memoria para que HOME/PROFILE lo muestre de inmediato
+            profileViewModel.saveProfile(
+                nombre = uiState.nombre,
+                apellido = uiState.apellido,
+                email = uiState.email,
+                telefono = uiState.telefono,
+                rut = uiState.rut,
+                password = uiState.password
+            )
+
+            onRegistered()
+            registerViewModel.resetSavedFlag()
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                modifier = Modifier
-                    .background(Color.White),
+                modifier = Modifier.background(Color.White),
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.White
                 ),
@@ -71,7 +88,6 @@ fun RegisterScreen(
         },
         containerColor = bgLight
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -80,7 +96,6 @@ fun RegisterScreen(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
@@ -101,7 +116,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Nombre
             InputText(
                 value = uiState.nombre,
                 onValueChange = { registerViewModel.onNombreChange(it) },
@@ -109,7 +123,6 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Apellido
             InputText(
                 value = uiState.apellido,
                 onValueChange = { registerViewModel.onApellidoChange(it) },
@@ -117,7 +130,6 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Email
             InputText(
                 value = uiState.email,
                 onValueChange = { registerViewModel.onEmailChange(it) },
@@ -125,7 +137,6 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Teléfono
             InputText(
                 value = uiState.telefono,
                 onValueChange = { registerViewModel.onTelefonoChange(it) },
@@ -133,7 +144,6 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // RUT
             InputText(
                 value = uiState.rut,
                 onValueChange = { registerViewModel.onRutChange(it) },
@@ -141,16 +151,14 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Password
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = { registerViewModel.onPasswordChange(it) },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                ),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !uiState.isSaving
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -163,29 +171,21 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // Mensaje de error de guardado (si falla Room)
+            if (!uiState.saveError.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = uiState.saveError ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Botón
             Button(
-                onClick = {
-                    // Guarda en Room (RegisterViewModel + RegisterRepository)
-                    registerViewModel.onEnviarFormulario()
-
-                    // Opcional: seguir guardando el perfil como antes
-                    profileViewModel.saveProfile(
-                        nombre = uiState.nombre,
-                        apellido = uiState.apellido,
-                        email = uiState.email,
-                        telefono = uiState.telefono,
-                        rut = uiState.rut,
-                        password = uiState.password
-                    )
-
-                    if (uiState.isFormValid) {
-                        onRegistered()
-                    }
-                },
-                enabled = isFormValid,
+                onClick = { registerViewModel.onEnviarFormulario() },
+                enabled = isFormValid && !uiState.isSaving,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -195,7 +195,7 @@ fun RegisterScreen(
                     contentColor = if (isFormValid) Color.White else Color(0xFF999999)
                 )
             ) {
-                Text("Guardar y continuar")
+                Text(if (uiState.isSaving) "Guardando..." else "Guardar y continuar")
             }
 
             Spacer(modifier = Modifier.height(16.dp))

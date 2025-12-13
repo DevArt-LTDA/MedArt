@@ -23,6 +23,8 @@ import medart.app.viewmodel.AppointmentViewModelFactory
 import medart.app.viewmodel.RegisterViewModel
 import medart.app.viewmodel.RegisterViewModelFactory
 import medart.app.viewmodel.UserProfileViewModel
+import medart.app.model.data.repository.UserRepository
+import medart.app.viewmodel.UserProfileViewModelFactory
 
 object Routes {
     const val RUT = "rut"
@@ -37,7 +39,14 @@ object Routes {
 @Composable
 fun MedArtApp() {
     val navController = rememberNavController()
-    val profileVm: UserProfileViewModel = viewModel()
+
+    val context = LocalContext.current
+    val db = remember { AppDatabase.getDatabase(context) }
+
+    val userRepository = remember { UserRepository(db.userDao()) }
+    val profileFactory = remember { UserProfileViewModelFactory(userRepository) }
+
+    val profileVm: UserProfileViewModel = viewModel(factory = profileFactory)
 
     MedArtNavGraph(
         navController = navController,

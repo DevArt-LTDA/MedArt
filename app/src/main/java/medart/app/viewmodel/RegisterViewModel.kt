@@ -22,7 +22,12 @@ data class RegisterUiState(
     val errorEmail: String? = null,
     val errorTelefono: String? = null,
     val errorRut: String? = null,
-    val errorPassword: String? = null
+    val errorPassword: String? = null,
+
+    // Estado de guardado
+    val isSaving: Boolean = false,
+    val saved: Boolean = false,
+    val saveError: String? = null
 ) {
     val isFormValid: Boolean
         get() =
@@ -50,14 +55,18 @@ class RegisterViewModel(
     fun onNombreChange(value: String) {
         _uiState.value = _uiState.value.copy(
             nombre = value,
-            errorNombre = if (value.isBlank()) "El nombre es obligatorio" else null
+            errorNombre = if (value.isBlank()) "El nombre es obligatorio" else null,
+            saved = false,
+            saveError = null
         )
     }
 
     fun onApellidoChange(value: String) {
         _uiState.value = _uiState.value.copy(
             apellido = value,
-            errorApellido = if (value.isBlank()) "El apellido es obligatorio" else null
+            errorApellido = if (value.isBlank()) "El apellido es obligatorio" else null,
+            saved = false,
+            saveError = null
         )
     }
 
@@ -69,59 +78,55 @@ class RegisterViewModel(
                 value.isBlank() -> "El correo es obligatorio"
                 !regex.matches(value) -> "Correo electrónico inválido"
                 else -> null
-            }
+            },
+            saved = false,
+            saveError = null
         )
     }
 
     fun onTelefonoChange(value: String) {
         val digitsOnly = value.filter { it.isDigit() }
-
         _uiState.value = _uiState.value.copy(
             telefono = digitsOnly,
             errorTelefono = when {
                 digitsOnly.isBlank() -> "El teléfono es obligatorio"
                 digitsOnly.length < 8 -> "Debe tener al menos 8 dígitos"
                 else -> null
-            }
+            },
+            saved = false,
+            saveError = null
         )
     }
 
     fun onRutChange(value: String) {
-        val clean = value.uppercase()
-        val rutRegex = Regex("^[0-9]{7,8}[0-9K]\$")
+        val clean = value.uppercase().trim()
+        val rutRegex = Regex("^[0-9]{7,8}[0-9K]$")
 
         _uiState.value = _uiState.value.copy(
             rut = clean,
-            errorRut =
-                if (!rutRegex.matches(clean))
-                    "RUT inválido (ej: 20345678K)"
-                else null
+            errorRut = if (!rutRegex.matches(clean)) "RUT inválido (ej: 20345678K)" else null,
+            saved = false,
+            saveError = null
         )
     }
 
     fun onPasswordChange(value: String) {
         _uiState.value = _uiState.value.copy(
             password = value,
-            errorPassword =
-                if (value.length < 6)
-                    "La contraseña debe tener al menos 6 caracteres"
-                else null
+            errorPassword = if (value.length < 6) "La contraseña debe tener al menos 6 caracteres" else null,
+            saved = false,
+            saveError = null
         )
     }
 
     fun onEnviarFormulario() {
         val current = _uiState.value
 
-        val nombreError =
-            if (current.nombre.isBlank()) "El nombre es obligatorio" else null
-        val apellidoError =
-            if (current.apellido.isBlank()) "El apellido es obligatorio" else null
-        val emailError =
-            if (current.email.isBlank()) "El correo es obligatorio" else null
-        val telefonoError =
-            if (current.telefono.isBlank()) "El teléfono es obligatorio" else null
-        val rutError =
-            if (current.rut.isBlank()) "El RUT es obligatorio" else null
+        val nombreError = if (current.nombre.isBlank()) "El nombre es obligatorio" else null
+        val apellidoError = if (current.apellido.isBlank()) "El apellido es obligatorio" else null
+        val emailError = if (current.email.isBlank()) "El correo es obligatorio" else null
+        val telefonoError = if (current.telefono.isBlank()) "El teléfono es obligatorio" else null
+        val rutError = if (current.rut.isBlank()) "El RUT es obligatorio" else null
         val passwordError =
             if (current.password.length < 6) "La contraseña debe tener al menos 6 caracteres" else null
 
@@ -131,26 +136,43 @@ class RegisterViewModel(
             errorEmail = emailError,
             errorTelefono = telefonoError,
             errorRut = rutError,
-            errorPassword = passwordError
+            errorPassword = passwordError,
+            isSaving = false,
+            saved = false,
+            saveError = null
         )
 
         _uiState.value = validatedState
-
         if (!validatedState.isFormValid) return
 
         viewModelScope.launch {
-            val entity = UserEntities(
-                name = validatedState.nombre,
-                lastName = validatedState.apellido,
-                email = validatedState.email,
-                passWord = validatedState.password,
-                phone = validatedState.telefono,
-                rut = validatedState.rut
-            )
+            _uiState.value = validatedState.copy(isSaving = true, saved = false, saveError = null)
 
-            repository.registerUser(entity)
+            try {
+                val entity = UserEntities(
+                    name = validatedState.nombre.trim(),
+                    lastName = validatedState.apellido.trim(),
+                    email = validatedState.email.trim(),
+                    passWord = validatedState.password,
+                    phone = validatedState.telefono.trim(),
+                    rut = validatedState.rut.trim()
+                )
 
-            _uiState.value = RegisterUiState()
+                repository.registerUser(entity)
+
+                // Señal para que la UI navegue cuando corresponda (LaunchedEffect en RegisterScreen)
+                _uiState.value = validatedState.copy(isSaving = false, saved = true, saveError = null)
+            } catch (e: Exception) {
+                _uiState.value = validatedState.copy(
+                    isSaving = false,
+                    saved = false,
+                    saveError = e.message ?: "Error guardando el registro"
+                )
+            }
         }
+    }
+
+    fun resetSavedFlag() {
+        _uiState.value = _uiState.value.copy(saved = false)
     }
 }
